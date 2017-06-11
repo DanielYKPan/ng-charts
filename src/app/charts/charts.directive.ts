@@ -14,6 +14,7 @@ export class ChartsDirective implements OnChanges, OnInit {
 
     @Input() public chartType: 'line' | 'bar' | 'radar' | 'pie' | 'doughnut' | 'polarArea' | 'bubble' | 'scatter';
     @Input() public chartLabels: string[];
+    @Input() public colors: any[];
     @Input() public datasets: any[];
 
     private chart: any;
@@ -71,7 +72,11 @@ export class ChartsDirective implements OnChanges, OnInit {
         if (this.datasets && this.datasets.length) {
             datasets = this.datasets.map(( elm: any, index: number ) => {
                 let newElm: any = Object.assign({}, elm);
-                Object.assign(newElm, getColors(this.chartType, index, newElm.data.length));
+                if (this.colors) {
+                    Object.assign(newElm, this.colors[index]);
+                } else {
+                    Object.assign(newElm, getColors(this.chartType, index, newElm.data.length));
+                }
                 return newElm;
             });
         }
