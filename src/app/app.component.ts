@@ -61,6 +61,17 @@ export class AppComponent implements OnInit {
     ngOnInit(): void {
     }
 
+    public randomize():void {
+        let _lineChartData:Array<any> = new Array(this.chartData.length);
+        for (let i = 0; i < this.chartData.length; i++) {
+            _lineChartData[i] = {data: new Array(this.chartData[i].data.length), label: this.chartData[i].label};
+            for (let j = 0; j < this.chartData[i].data.length; j++) {
+                _lineChartData[i].data[j] = Math.floor((Math.random() * 100) + 1);
+            }
+        }
+        this.chartData = _lineChartData;
+    }
+
     // events
     public chartClicked(e:any):void {
         console.log(e);

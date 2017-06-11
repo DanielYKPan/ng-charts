@@ -18,8 +18,8 @@ export class ChartsDirective implements OnChanges, OnInit {
     @Input() public datasets: any[];
     @Input() public options: any = {};
 
-    @Output() public chartClick:EventEmitter<any> = new EventEmitter();
-    @Output() public chartHover:EventEmitter<any> = new EventEmitter();
+    @Output() public chartClick: EventEmitter<any> = new EventEmitter();
+    @Output() public chartHover: EventEmitter<any> = new EventEmitter();
 
     private chart: any;
     private ctx: any;
@@ -39,6 +39,14 @@ export class ChartsDirective implements OnChanges, OnInit {
     }
 
     public ngOnChanges( changes: SimpleChanges ): void {
+        if (this.initFlag) {
+            if (changes.hasOwnProperty('datasets')) {
+                this.updateChartData(changes['datasets'].currentValue);
+                this.chart.update();
+            } else {
+                this.refresh();
+            }
+        }
     }
 
     /**
@@ -53,7 +61,7 @@ export class ChartsDirective implements OnChanges, OnInit {
         // hock for onHover and onClick events
         options.hover = options.hover || {};
         if (!options.hover.onHover) {
-            options.hover.onHover = (active:Array<any>) => {
+            options.hover.onHover = ( active: Array<any> ) => {
                 if (active && !active.length) {
                     return;
                 }
@@ -62,7 +70,7 @@ export class ChartsDirective implements OnChanges, OnInit {
         }
 
         if (!options.onClick) {
-            options.onClick = (event:any, active:Array<any>) => {
+            options.onClick = ( event: any, active: Array<any> ) => {
                 this.chartClick.emit({event, active});
             };
         }
@@ -110,5 +118,22 @@ export class ChartsDirective implements OnChanges, OnInit {
         }
 
         return datasets;
+    }
+
+    /**
+     * Update chart data
+     * */
+    private updateChartData( newDataValues: any[] ): void {
+        if (Array.isArray(newDataValues[0].data)) {
+            this.chart.data.datasets.forEach(( dataset: any, i: number ) => {
+                dataset.data = newDataValues[i].data;
+
+                if (newDataValues[i].label) {
+                    dataset.label = newDataValues[i].label;
+                }
+            });
+        } else {
+            this.chart.data.datasets[0].data = newDataValues;
+        }
     }
 }
