@@ -2,7 +2,7 @@
  * charts.directive
  */
 
-import { Directive, ElementRef, OnInit } from '@angular/core';
+import { Directive, ElementRef, Input, OnInit } from '@angular/core';
 import { Chart } from 'chart.js';
 
 @Directive({
@@ -10,6 +10,8 @@ import { Chart } from 'chart.js';
     exportAs: 'yk-chart'
 })
 export class ChartsDirective implements OnInit {
+
+    @Input() chartType: 'line' | 'bar' | 'radar' | 'pie' | 'doughnut' | 'polarArea' | 'bubble' | 'scatter';
 
     private ctx: any;
     private cvs: any;
@@ -22,7 +24,7 @@ export class ChartsDirective implements OnInit {
         this.cvs = this.el.nativeElement;
 
         new Chart(this.ctx, {
-            type: 'bar',
+            type: this.chartType,
             data: {
                 labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
                 datasets: [{
