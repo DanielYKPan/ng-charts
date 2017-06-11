@@ -13,15 +13,15 @@ import { Component, OnInit } from "@angular/core";
 export class AppComponent implements OnInit {
 
     public chartType = 'line';
-    public chartLabels:Array<any> = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+    public chartLabels: Array<any> = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
 
-    public chartData:Array<any> = [
+    public chartData: Array<any> = [
         {data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A'},
         {data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B'},
         {data: [18, 48, 77, 9, 100, 27, 40], label: 'Series C'}
     ];
 
-    public chartColors:Array<any> = [
+    public chartColors: Array<any> = [
         { // grey
             backgroundColor: 'rgba(148,159,177,0.2)',
             borderColor: 'rgba(148,159,177,1)',
@@ -48,9 +48,25 @@ export class AppComponent implements OnInit {
         }
     ];
 
+    public chartOptions: any = {
+        title: {
+            display: true,
+            text: 'Custom Chart Title'
+        }
+    };
+
     constructor() {
     }
 
     ngOnInit(): void {
+    }
+
+    // events
+    public chartClicked(e:any):void {
+        console.log(e);
+    }
+
+    public chartHovered(e:any):void {
+        console.log(e);
     }
 }

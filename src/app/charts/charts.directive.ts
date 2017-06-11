@@ -2,7 +2,7 @@
  * charts.directive
  */
 
-import { Directive, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Chart } from 'chart.js';
 import { getColors } from './colors';
 
@@ -16,6 +16,10 @@ export class ChartsDirective implements OnChanges, OnInit {
     @Input() public chartLabels: string[];
     @Input() public colors: any[];
     @Input() public datasets: any[];
+    @Input() public options: any = {};
+
+    @Output() public chartClick:EventEmitter<any> = new EventEmitter();
+    @Output() public chartHover:EventEmitter<any> = new EventEmitter();
 
     private chart: any;
     private ctx: any;
@@ -44,13 +48,32 @@ export class ChartsDirective implements OnChanges, OnInit {
      * */
     public getChartBuilder( ctx: any ): any {
         let datasets: any = this.getDatasets();
+        let options: any = Object.assign({}, this.options);
+
+        // hock for onHover and onClick events
+        options.hover = options.hover || {};
+        if (!options.hover.onHover) {
+            options.hover.onHover = (active:Array<any>) => {
+                if (active && !active.length) {
+                    return;
+                }
+                this.chartHover.emit({active});
+            };
+        }
+
+        if (!options.onClick) {
+            options.onClick = (event:any, active:Array<any>) => {
+                this.chartClick.emit({event, active});
+            };
+        }
+
         let opts = {
             type: this.chartType,
             data: {
                 labels: this.chartLabels,
                 datasets: datasets
             },
-            options: {}
+            options: options
         };
         return new Chart(ctx, opts);
     }
