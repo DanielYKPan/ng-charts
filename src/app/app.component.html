@@ -21,7 +21,15 @@
         </div>
 
         <div class="demo">
-            <canvas ykChart [chartType]="chartType" [chartLabels]="chartLabels"></canvas>
+            <canvas ykChart
+                    [chartType]="chartType"
+                    [chartLabels]="chartLabels"
+                    [datasets]="chartData"></canvas>
+
+            <canvas baseChart width="400" height="400"
+                    [datasets]="chartData"
+                    [labels]="chartLabels"
+                    [chartType]="chartType"></canvas>
         </div>
     </section>
 </main>

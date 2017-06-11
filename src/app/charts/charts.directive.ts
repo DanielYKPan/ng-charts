@@ -4,6 +4,7 @@
 
 import { Directive, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Chart } from 'chart.js';
+import { getColors } from './colors';
 
 @Directive({
     selector: 'canvas[ykChart]',
@@ -11,13 +12,14 @@ import { Chart } from 'chart.js';
 })
 export class ChartsDirective implements OnChanges, OnInit {
 
-    @Input() chartType: 'line' | 'bar' | 'radar' | 'pie' | 'doughnut' | 'polarArea' | 'bubble' | 'scatter';
-    @Input() chartLabels: string[];
+    @Input() public chartType: 'line' | 'bar' | 'radar' | 'pie' | 'doughnut' | 'polarArea' | 'bubble' | 'scatter';
+    @Input() public chartLabels: string[];
+    @Input() public datasets: any[];
 
     private chart: any;
     private ctx: any;
     private cvs: any;
-    private initFlag:boolean = false;
+    private initFlag: boolean = false;
 
     constructor( private el: ElementRef ) {
     }
@@ -26,45 +28,59 @@ export class ChartsDirective implements OnChanges, OnInit {
         this.ctx = this.el.nativeElement.getContext('2d');
         this.cvs = this.el.nativeElement;
         this.initFlag = true;
-        this.refresh();
+        if (this.datasets) {
+            this.refresh();
+        }
     }
 
     public ngOnChanges( changes: SimpleChanges ): void {
     }
 
-    public getChartBuilder(ctx: any): any {
+    /**
+     * Generate Chart
+     * @param ctx
+     * @returns chart
+     * */
+    public getChartBuilder( ctx: any ): any {
+        let datasets: any = this.getDatasets();
         let opts = {
             type: this.chartType,
             data: {
                 labels: this.chartLabels,
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
+                datasets: datasets
             },
             options: {}
         };
         return new Chart(ctx, opts);
     }
 
+    /**
+     * Refresh the chart
+     * */
     private refresh(): void {
         this.chart = this.getChartBuilder(this.ctx);
+    }
+
+    /**
+     * Get a chart datasets
+     * @returns object
+     * */
+    private getDatasets(): any {
+        let datasets: any = void 0;
+
+        if (this.datasets && this.datasets.length) {
+            datasets = this.datasets.map(( elm: any, index: number ) => {
+                let newElm: any = Object.assign({}, elm);
+                Object.assign(newElm, getColors(this.chartType, index, newElm.data.length));
+                return newElm;
+            });
+        }
+
+        if (!datasets) {
+            throw new Error(`ng-charts configuration error,
+      data or datasets field are required to render char ${this.chartType}`);
+        }
+
+        return datasets;
     }
 }
