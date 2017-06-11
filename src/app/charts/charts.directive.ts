@@ -2,20 +2,22 @@
  * charts.directive
  */
 
-import { Directive, ElementRef, Input, OnInit } from '@angular/core';
+import { Directive, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Chart } from 'chart.js';
 
 @Directive({
     selector: 'canvas[ykChart]',
     exportAs: 'yk-chart'
 })
-export class ChartsDirective implements OnInit {
+export class ChartsDirective implements OnChanges, OnInit {
 
     @Input() chartType: 'line' | 'bar' | 'radar' | 'pie' | 'doughnut' | 'polarArea' | 'bubble' | 'scatter';
     @Input() chartLabels: string[];
 
+    private chart: any;
     private ctx: any;
     private cvs: any;
+    private initFlag:boolean = false;
 
     constructor( private el: ElementRef ) {
     }
@@ -23,8 +25,15 @@ export class ChartsDirective implements OnInit {
     public ngOnInit(): void {
         this.ctx = this.el.nativeElement.getContext('2d');
         this.cvs = this.el.nativeElement;
+        this.initFlag = true;
+        this.refresh();
+    }
 
-        new Chart(this.ctx, {
+    public ngOnChanges( changes: SimpleChanges ): void {
+    }
+
+    public getChartBuilder(ctx: any): any {
+        let opts = {
             type: this.chartType,
             data: {
                 labels: this.chartLabels,
@@ -51,6 +60,11 @@ export class ChartsDirective implements OnInit {
                 }]
             },
             options: {}
-        });
+        };
+        return new Chart(ctx, opts);
+    }
+
+    private refresh(): void {
+        this.chart = this.getChartBuilder(this.ctx);
     }
 }
