@@ -12,6 +12,7 @@ import { Chart } from 'chart.js';
 export class ChartsDirective implements OnInit {
 
     @Input() chartType: 'line' | 'bar' | 'radar' | 'pie' | 'doughnut' | 'polarArea' | 'bubble' | 'scatter';
+    @Input() chartLabels: string[];
 
     private ctx: any;
     private cvs: any;
@@ -26,7 +27,7 @@ export class ChartsDirective implements OnInit {
         new Chart(this.ctx, {
             type: this.chartType,
             data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                labels: this.chartLabels,
                 datasets: [{
                     label: '# of Votes',
                     data: [12, 19, 3, 5, 2, 3],

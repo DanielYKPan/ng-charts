@@ -13,6 +13,7 @@ import { Component, OnInit } from "@angular/core";
 export class AppComponent implements OnInit {
 
     public chartType = 'bar';
+    public chartLabels:Array<any> = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
 
     constructor() {
     }
