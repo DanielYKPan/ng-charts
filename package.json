@@ -1,18 +1,18 @@
 {
-  "name": "ng-yk-process",
+  "name": "ng-charts",
   "version": "1.0.0-alpha",
-  "description": "Angular Process Loader Component",
+  "description": "Angular Directive for Chart.js",
   "keywords": [
     "Angular",
-    "rxjs",
-    "process-loader",
+    "chart.js",
+    "directive",
     "component"
   ],
   "author": "daniel pan <myron.yk.pan@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/DanielYKPan/ng-yk-process.git"
+    "url": "https://github.com/DanielYKPan/ng-charts.git"
   },
   "scripts": {
     "server:dev": "webpack-dev-server --config config/webpack.dev.js --open --progress --profile --watch --content-base src/",
@@ -20,7 +20,14 @@
     "test": "karma start",
     "build": "rimraf dist && webpack --config config/webpack.prod.js --progress --profile --bail"
   },
+  "jsnext:main": "charts.module.js",
+  "module": "charts.module.js",
+  "types": "charts.module.d.ts",
+  "main": "charts.bundle.js",
   "dependencies": {
+    "chart.js": "^2.6.0"
+  },
+  "devDependencies": {
     "@angular/common": "~4.1.3",
     "@angular/compiler": "~4.1.3",
     "@angular/compiler-cli": "^4.0.0",
@@ -33,12 +40,11 @@
     "@angular/router": "~4.1.3",
     "core-js": "^2.4.1",
     "rxjs": "5.0.2",
-    "zone.js": "^0.8.4"
-  },
-  "devDependencies": {
+    "zone.js": "^0.8.4",
     "@types/jasmine": "^2.5.36",
     "@types/node": "^7.0.0",
     "@types/selenium-webdriver": "~2.53.39",
+    "@types/chart.js": "^2.4.3",
     "angular2-template-loader": "^0.6.0",
     "autoprefixer": "^6.5.3",
     "awesome-typescript-loader": "~3.0.0-beta.18",
@@ -73,6 +79,10 @@
     "raw-loader": "^0.5.1",
     "resolve-url-loader": "^2.0.2",
     "rimraf": "^2.5.2",
+    "rollup": "^0.41.6",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-uglify": "^1.0.2",
     "run-sequence": "^1.2.2",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",

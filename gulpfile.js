@@ -86,6 +86,10 @@
         return gulp.src(['./dist', './npmdist', config.tmpOutputPath], {read: false}).pipe(clean());
     });
 
+    gulp.task('clean.dist', function () {
+        return gulp.src(['./dist'], {read: false}).pipe(clean());
+    });
+
     gulp.task('backup.ts.tmp', function () {
         return gulp.src(config.allTs).pipe(gulp.dest(config.tmpOutputPath));
     });
@@ -102,6 +106,10 @@
         return gulp.src(config.allDistFiles).pipe(gulp.dest('./npmdist/dist'));
     });
 
+    gulp.task('copy.dist.to.npmdist', function () {
+        return gulp.src(config.allDistFiles).pipe(gulp.dest('./npmdist'));
+    });
+
     gulp.task('copy.root.files.to.npmdist.dir', function () {
         return gulp.src(
             [
@@ -113,6 +121,11 @@
             ]).pipe(gulp.dest('./npmdist'));
     });
 
+    gulp.task('bundle', function (cb) {
+        var cmd = 'node_modules/.bin/rollup -c rollup.config.js dist/charts.module.js > tmp/charts.bundle.js';
+        return run_proc(cmd, cb);
+    });
+
     gulp.task('all', function (cb) {
         runSequence(
             'clean',
@@ -120,9 +133,11 @@
             'minify.css',
             'minify.html',
             'inline.template.and.styles.to.component',
+            'tsc.compile.dist',
+            'bundle',
+            'clean.dist',
             'ngc',
-            'copy.src.to.npmdist.dir',
-            'copy.dist.to.npmdist.dir',
+            'copy.dist.to.npmdist',
             'copy.root.files.to.npmdist.dir',
             'delete.tmp',
             cb
