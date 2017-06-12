@@ -2,7 +2,10 @@
  * charts.directive
  */
 
-import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+    Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output,
+    SimpleChanges
+} from '@angular/core';
 import { Chart } from 'chart.js';
 import { getColors } from './colors';
 
@@ -10,11 +13,12 @@ import { getColors } from './colors';
     selector: 'canvas[ykChart]',
     exportAs: 'yk-chart'
 })
-export class ChartsDirective implements OnChanges, OnInit {
+export class ChartsDirective implements OnChanges, OnInit, OnDestroy {
 
     @Input() public chartType: 'line' | 'bar' | 'radar' | 'pie' | 'doughnut' | 'polarArea' | 'bubble' | 'scatter';
     @Input() public chartLabels: string[];
     @Input() public colors: any[];
+    @Input() public data: number[] | any[];
     @Input() public datasets: any[];
     @Input() public options: any = {};
 
@@ -33,19 +37,28 @@ export class ChartsDirective implements OnChanges, OnInit {
         this.ctx = this.el.nativeElement.getContext('2d');
         this.cvs = this.el.nativeElement;
         this.initFlag = true;
-        if (this.datasets) {
+        if (this.data || this.datasets) {
             this.refresh();
         }
     }
 
     public ngOnChanges( changes: SimpleChanges ): void {
         if (this.initFlag) {
-            if (changes.hasOwnProperty('datasets')) {
-                this.updateChartData(changes['datasets'].currentValue);
+            if (changes.hasOwnProperty('data') ||
+                changes.hasOwnProperty('datasets')) {
+                let currentValue = changes['datasets'].currentValue || changes['data'].currentValue;
+                this.updateChartData(currentValue);
                 this.chart.update();
             } else {
                 this.refresh();
             }
+        }
+    }
+
+    public ngOnDestroy(): any {
+        if (this.chart) {
+            this.chart.destroy();
+            this.chart = void 0;
         }
     }
 
@@ -100,10 +113,23 @@ export class ChartsDirective implements OnChanges, OnInit {
     private getDatasets(): any {
         let datasets: any = void 0;
 
-        if (this.datasets && this.datasets.length) {
-            datasets = this.datasets.map(( elm: any, index: number ) => {
+        if (!this.datasets || !this.datasets.length && (this.data && this.data.length)) {
+            if (Array.isArray(this.data[0])) {
+                datasets = (this.data as Array<number[]>).map(( data: number[], index: number ) => {
+                    return {data, label: this.chartLabels[index] || `Label ${index}`};
+                });
+            } else {
+                datasets = [{data: this.data, label: `Label 0`}];
+            }
+        }
+
+        console.log(datasets);
+
+        if (this.datasets && this.datasets.length ||
+            (datasets && datasets.length)) {
+            datasets = (this.datasets || datasets).map(( elm: any, index: number ) => {
                 let newElm: any = Object.assign({}, elm);
-                if (this.colors) {
+                if (this.colors && this.colors.length) {
                     Object.assign(newElm, this.colors[index]);
                 } else {
                     Object.assign(newElm, getColors(this.chartType, index, newElm.data.length));
